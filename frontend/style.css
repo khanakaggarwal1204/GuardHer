@@ -1,0 +1,356 @@
+/* GuardHer AI Safety Dashboard - Custom Styles */
+/* Welcoming, empowering design for women's safety */
+
+/* ===========================
+   SECTION VISIBILITY
+   =========================== */
+   .dashboard-section {
+    display: none;
+}
+
+.dashboard-section.active-section {
+    display: block;
+}
+
+/* ===========================
+   CUSTOM FONTS & BODY
+   =========================== */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===========================
+   ANIMATIONS
+   =========================== */
+
+/* Fade in animation for cards and sections */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Slide in animation for alerts and dynamic content */
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+/* Soft pulse animation for SOS button */
+@keyframes softPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.05); 
+        opacity: 0.9; 
+    }
+}
+
+/* Result highlight animation when AI analysis completes */
+@keyframes highlightResult {
+    0% { 
+        background-color: #FEF3F2; 
+    }
+    50% { 
+        background-color: #FCE7F3; 
+    }
+    100% { 
+        background-color: #FEF3F2; 
+    }
+}
+
+/* Apply animations to elements */
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out;
+}
+
+.soft-pulse {
+    animation: softPulse 2s ease-in-out infinite;
+}
+
+.result-highlight {
+    animation: highlightResult 1s ease-in-out;
+}
+
+/* ===========================
+   CUSTOM SCROLLBAR
+   Soft pink/red theme
+   =========================== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FEF3F2;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #FECACA;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #FCA5A5;
+}
+
+/* ===========================
+   GRADIENT BACKGROUNDS
+   Soft, welcoming color palettes
+   =========================== */
+
+/* Safe - soft green gradient */
+.gradient-safe {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+}
+
+/* Warning - gentle yellow gradient */
+.gradient-warning {
+    background: linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%);
+}
+
+/* High Risk - soft red gradient (not harsh) */
+.gradient-risk {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+}
+
+/* Header/Sidebar - purple-pink gradient */
+.gradient-header {
+    background: linear-gradient(135deg, #FCE7F3 0%, #F3E8FF 100%);
+}
+
+/* ===========================
+   CARD HOVER EFFECTS
+   Smooth, friendly interactions
+   =========================== */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* ===========================
+   NAVIGATION ITEMS
+   Active and hover states
+   =========================== */
+.nav-item {
+    cursor: pointer;
+}
+
+.nav-item.active {
+    background-color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.nav-item:hover {
+    background-color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ===========================
+   BUTTON STYLES
+   Friendly, approachable buttons
+   =========================== */
+
+/* Primary analyze button gradient */
+#analyzeButton {
+    background: linear-gradient(135deg, #C084FC 0%, #F472B6 100%);
+}
+
+#analyzeButton:hover {
+    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+}
+
+/* SOS Button - soft pulsing red/pink */
+#sosButton {
+    cursor: pointer;
+}
+
+#sosButton:hover {
+    box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.25);
+}
+
+/* ===========================
+   TABLE STYLES
+   Soft, readable alert rows
+   =========================== */
+table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
+/* ===========================
+   INPUT & TEXTAREA
+   Smooth focus states
+   =========================== */
+textarea:focus,
+input:focus {
+    outline: none;
+    border-color: #DDD6FE;
+    box-shadow: 0 0 0 3px rgba(196, 181, 253, 0.1);
+}
+
+/* ===========================
+   RISK BADGES
+   Color-coded, soft pill badges
+   =========================== */
+.badge-safe {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    color: #065F46;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%);
+    color: #92400E;
+}
+
+.badge-risk {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+    color: #991B1B;
+}
+
+/* ===========================
+   UTILITY CLASSES
+   =========================== */
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent animation conflicts */
+.no-animate {
+    animation: none !important;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   Mobile-friendly adjustments
+   =========================== */
+@media (max-width: 768px) {
+    /* Stack sidebar on mobile */
+    aside {
+        width: 100%;
+        position: relative;
+        height: auto;
+    }
+
+    main {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    /* Adjust grid for mobile */
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Make cards full width */
+    .card-hover {
+        margin-bottom: 1rem;
+    }
+
+    /* Adjust font sizes */
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+}
+
+/* ===========================
+   LOADING STATES
+   =========================== */
+.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid #C084FC;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===========================
+   ACCESSIBILITY
+   =========================== */
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid #C084FC;
+    outline-offset: 2px;
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ===========================
+   PRINT STYLES
+   =========================== */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .gradient-header,
+    .gradient-safe,
+    .gradient-warning,
+    .gradient-risk {
+        background: white;
+        border: 1px solid #E5E7EB;
+    }
+}
