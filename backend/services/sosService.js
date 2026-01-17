@@ -1,117 +1,121 @@
-// routes/sos.js
-const express = require('express');
-const router = express.Router();
+// backend/services/sosService.js
+
 const memoryStore = require('../db/memoryStore');
-const sosService = require('../services/sosService');
+const evidenceStore = require('../db/evidencestore');
+const { v4: uuidv4 } = require('uuid');
 
-// Optional: authentication middleware
-// const authMiddleware = (req, res, next) => {
-//   const token = req.headers['authorization'];
-//   if (!token || token !== process.env.USER_TOKEN) {
-//     return res.status(403).json({ success: false, message: 'Forbidden' });
-//   }
-//   next();
-// };
-// router.use(authMiddleware);
+class SOSService {
+  // Create a new SOS session
+  createSOSSession(userId, location, severity) {
+    const sessionId = uuidv4();
+    const session = {
+      id: sessionId,
+      userId,
+      status: 'active',
+      severity,          // e.g., 'low', 'medium', 'high'
+      location,
+      helpers: [],
+      createdAt: new Date()
+    };
 
-// Helper to validate required fields
-const validateFields = (fields, body) => {
-  for (const field of fields) {
-    if (!body[field]) return `Missing field: ${field}`;
+    memoryStore.addSession(sessionId, session);
+
+    // Trigger severity-based actions
+    this.handleSeverity(session);
+
+    return session;
   }
-  return null;
-};
 
-// Create new SOS session
-router.post('/create', async (req, res) => {
-  try {
-    const err = validateFields(['userId', 'location', 'severity'], req.body);
-    if (err) return res.status(400).json({ success: false, message: err });
+  // Update session info (status, location, etc.)
+  updateSOSSession(sessionId, updates) {
+    const session = memoryStore.updateSession(sessionId, updates);
+    if (!session) return null;
 
-    const { userId, location, severity } = req.body;
-    const session = sosService.createSOSSession(userId, location, severity);
-    res.json({ success: true, data: session, message: 'SOS session created' });
-  } catch (error) {
-    console.error('Create SOS Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to create SOS session' });
+    // Update live location if provided
+    if (updates.location) {
+      memoryStore.updateLiveLocation(session.userId, updates.location.lat, updates.location.lng);
+    }
+
+    return session;
   }
-});
 
-// Update SOS session (status, helpers, etc.)
-router.post('/update', async (req, res) => {
-  try {
-    const err = validateFields(['sessionId', 'updates'], req.body);
-    if (err) return res.status(400).json({ success: false, message: err });
+  // Resolve a session
+  resolveSOSSession(sessionId) {
+    const session = memoryStore.updateSession(sessionId, { status: 'resolved' });
+    if (!session) return null;
 
-    const { sessionId, updates } = req.body;
-    const updated = sosService.updateSOSSession(sessionId, updates);
-    res.json({ success: true, data: updated, message: 'SOS session updated' });
-  } catch (error) {
-    console.error('Update SOS Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to update SOS session' });
+    // Optional: Remove live tracking
+    memoryStore.deleteLiveLocation(session.userId);
+
+    console.log(`SOS session ${sessionId} resolved for user ${session.userId}`);
+    return session;
   }
-});
 
-// Get live location
-router.get('/track/:userId', (req, res) => {
-  try {
-    const { userId } = req.params;
-    const location = memoryStore.getLiveLocation(userId);
-    res.json({ success: true, data: location || {}, message: 'Live location fetched' });
-  } catch (error) {
-    console.error('Track Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get live location' });
+  // Assign a trusted helper to a session
+  assignHelper(sessionId, helperId) {
+    const session = memoryStore.addHelperToSession(sessionId, helperId);
+    if (!session) return null;
+
+    // Simulate sending notification to helper
+    this.notifyHelper(helperId, session);
+
+    return session;
   }
-});
 
-// Resolve SOS
-router.post('/resolve/:sessionId', (req, res) => {
-  try {
-    const { sessionId } = req.params;
-    const resolved = sosService.resolveSOSSession(sessionId);
-    res.json({ success: true, data: resolved, message: 'SOS session resolved' });
-  } catch (error) {
-    console.error('Resolve Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to resolve SOS session' });
+  // Remove a helper from a session
+  removeHelper(sessionId, helperId) {
+    return memoryStore.removeHelperFromSession(sessionId, helperId);
   }
-});
 
-// Assign helper
-router.post('/helpers/:sessionId', (req, res) => {
-  try {
-    const { sessionId } = req.params;
-    const { helperId } = req.body;
-    if (!helperId) return res.status(400).json({ success: false, message: 'Missing helperId' });
-
-    const updated = memoryStore.addHelperToSession(sessionId, helperId);
-    res.json({ success: true, data: updated, message: 'Helper assigned' });
-  } catch (error) {
-    console.error('Assign Helper Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to assign helper' });
+  // Handle severity-based actions
+  handleSeverity(session) {
+    switch (session.severity) {
+      case 'low':
+        console.log(`Low severity SOS: notify user only.`);
+        break;
+      case 'medium':
+        console.log(`Medium severity SOS: notify user and helpline.`);
+        this.callHelpline(session.userId);
+        break;
+      case 'high':
+        console.log(`High severity SOS: notify user, helpline, and authorities.`);
+        this.callHelpline(session.userId);
+        this.notifyAuthorities(session);
+        break;
+      default:
+        console.log(`Unknown severity level.`);
+    }
   }
-});
 
-// Remove helper
-router.delete('/helpers/:sessionId/:helperId', (req, res) => {
-  try {
-    const { sessionId, helperId } = req.params;
-    const updated = memoryStore.removeHelperFromSession(sessionId, helperId);
-    res.json({ success: true, data: updated, message: 'Helper removed' });
-  } catch (error) {
-    console.error('Remove Helper Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to remove helper' });
+  // Simulate calling helpline
+  callHelpline(userId) {
+    console.log(`Calling helpline for user ${userId}...`);
   }
-});
 
-// Get all active SOS sessions
-router.get('/active', (req, res) => {
-  try {
-    const sessions = Object.values(memoryStore.sosSessions).filter(s => s.status !== 'resolved');
-    res.json({ success: true, data: sessions, message: 'Active SOS sessions fetched' });
-  } catch (error) {
-    console.error('Active SOS Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch active sessions' });
+  // Simulate notifying authorities
+  notifyAuthorities(session) {
+    console.log(`Notifying authorities for SOS ${session.id}, user ${session.userId}`);
   }
-});
 
-module.exports = router;
+  // Simulate sending WhatsApp/Telegram notification to helper
+  notifyHelper(helperId, session) {
+    console.log(`Notifying helper ${helperId} for SOS ${session.id}`);
+  }
+
+  // Add evidence to the evidence locker
+  async addEvidence(userId, type, data) {
+    return await evidenceStore.addEvidence(userId, type, data);
+  }
+
+  // Get evidence for a user
+  async getEvidence(userId) {
+    return await evidenceStore.getEvidenceByUser(userId);
+  }
+
+  // Get all active sessions
+  getActiveSessions() {
+    return Object.values(memoryStore.sosSessions).filter(s => s.status !== 'resolved');
+  }
+}
+
+module.exports = new SOSService();
