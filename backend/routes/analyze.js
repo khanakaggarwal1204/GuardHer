@@ -12,6 +12,9 @@ const authMiddleware = (req, res, next) => {
   next();
 };
 
+// Apply middleware to all routes
+router.use(authMiddleware);
+
 // Get dashboard data
 router.get('/dashboard', async (req, res) => {
   const data = await analytics.getDashboardData();
