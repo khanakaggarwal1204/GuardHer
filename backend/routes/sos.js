@@ -3,6 +3,13 @@ const express = require('express');
 const router = express.Router();
 const memoryStore = require('../db/memoryStore');
 const sosService = require('../services/sosService');
+// Helper to validate required fields
+const validateFields = (fields, body) => {
+  for (const field of fields) {
+    if (!body[field]) return `Missing field: ${field}`;
+  }
+  return null;
+};
 
 // Create new SOS session
 router.post('/create', async (req, res) => {
